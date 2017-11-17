@@ -1,5 +1,10 @@
 package sudokuSolver;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class Solver1 extends Thread{
 	   private Thread t;
 	   private String threadName;
@@ -7,6 +12,7 @@ public class Solver1 extends Thread{
 	   static String winnerName = "null";
 	   public boolean didThisClassSolvedCorrect = false;
 	   public int startX,startY;
+	   Sudoku controller = new Sudoku();
 	   
 	   
 	   public static String getWinnerName() {
@@ -70,10 +76,13 @@ public class Solver1 extends Thread{
 			//if(t.isInterrupted())
 	        // System.out.println("Thread " +  threadName + " interrupted.");
 	    	  if(winnerName.equals("null")){
-	    		  t.setPriority(Thread.MAX_PRIORITY);
 	    		  winnerName = threadName;
 	    		  delete();
 	    	  }
+	    	  
+	    	  if(!Sudoku.done)
+		   		   controller.thread1Finished();
+	    	  
 	    	  Sudoku.done=true;
 	    	  delete();
 	      }
@@ -88,7 +97,6 @@ public class Solver1 extends Thread{
 	      if (t == null) {
 	         t = new Thread (this, threadName);
 	         t.start ();
-	         t.setPriority(Thread.NORM_PRIORITY);
 	      }
 	   }
 	   
@@ -108,7 +116,21 @@ public class Solver1 extends Thread{
 	   
 	   public void solve(int i, int j) throws Exception {
 			// Throw an exception to stop the process if the puzzle is solved
-		   
+		   try(FileWriter fw = new FileWriter("thread1.txt", true);
+				    BufferedWriter bw = new BufferedWriter(fw);
+				    PrintWriter out = new PrintWriter(bw))
+				{
+				   for(int a=0;a<9;a++){
+					   for(int b=0; b<9; b++){
+						   out.print(sudokuTable[a][b]);
+					   }
+					   out.println();
+				   }
+				   out.println();
+				   out.println();
+				} catch (IOException e) {
+				    //exception handling left as an exercise for the reader
+				}
 		   
 		   if(Sudoku.done)
 				throw new Exception("ex");
