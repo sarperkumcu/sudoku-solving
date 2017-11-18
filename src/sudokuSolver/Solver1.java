@@ -72,22 +72,23 @@ public class Solver1 extends Thread{
 	      try {
 	    	  
 	    		 solve(startX,startY);
-	         if(!areWeDone()){
+	       /*  if(!areWeDone()){
 	        	 startX = 0;
 	        	 startY = 0;
 	        	 solve(startX,startY);
 	         }
-	         
+	         */
 	    	  }
 	         
 	      catch (Exception e) {
+	    	    if(!Sudoku.done){
+	  	    	  Sudoku.done=true;
+	      		   controller.thread1Finished();
+
+	      	  }
 	    	  }
 	    	  
-	      if(!Sudoku.done){
-	    	  Sudoku.done=true;
-    		   controller.thread1Finished();
-
-    	  }
+	  
 	    	  delete();
 	      }
 }
@@ -117,17 +118,23 @@ public class Solver1 extends Thread{
 	   
 	   public void solve(int i, int j) throws Exception {
 		   
-		   if(Sudoku.done)
+		   if(Sudoku.done || areWeDone()){
 				throw new Exception("ex");
 
+		   }
+		
+			
+			/*if(startX == 0 && startY == 0){
+				throw new Exception("ex");
+			}*/
 		   
-			if (i > 8 || areWeDone()) {
-				if(startX == 0 && startY == 0){
-					throw new Exception("ex");
-				}
+			if (i > 8) {
+				startX = 0;
+				startY = 0 ;
+				solve(startX,startY);
 				return;
 			}
-
+			
 			if (sudokuTable[i][j] != 0)
 				nextCell(i, j);
 			else {

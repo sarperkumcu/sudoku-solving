@@ -45,8 +45,8 @@ public class Sudoku implements Runnable{
 		sudokuTable3.setTable();
 		//sudoku.showTable();
 		 thread1 = new Solver1("thread1",sudokuTable1.sudokuTable,7,1);
-		 thread2 = new Solver2("thread2",sudokuTable2.sudokuTable,4,7);
-		 thread3 = new Solver3("thread3",sudokuTable3.sudokuTable,3,2);
+		 thread2 = new Solver2("thread2",sudokuTable2.sudokuTable,0,0);
+		 thread3 = new Solver3("thread3",sudokuTable3.sudokuTable,4,7);
 		thread1.start();
 		thread2.start();
 		thread3.start();
