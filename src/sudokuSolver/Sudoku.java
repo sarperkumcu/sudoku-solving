@@ -19,6 +19,8 @@ public class Sudoku implements Runnable{
 	static Solver2 thread2;
 	static Solver3 thread3;
 	
+	boolean alreadyCreatedFrames = false;
+	
 	JFrame thread1Frame = new JFrame();
 	JFrame thread2Frame = new JFrame();
 	JFrame thread3Frame = new JFrame();
@@ -42,9 +44,9 @@ public class Sudoku implements Runnable{
 		sudokuTable2.setTable();
 		sudokuTable3.setTable();
 		//sudoku.showTable();
-		 thread1 = new Solver1("thread1",sudokuTable1.sudokuTable,2,1);
-		 thread2 = new Solver2("thread2",sudokuTable2.sudokuTable,0,0);
-		 thread3 = new Solver3("thread3",sudokuTable3.sudokuTable,5,7);
+		 thread1 = new Solver1("thread1",sudokuTable1.sudokuTable,7,1);
+		 thread2 = new Solver2("thread2",sudokuTable2.sudokuTable,4,7);
+		 thread3 = new Solver3("thread3",sudokuTable3.sudokuTable,3,2);
 		thread1.start();
 		thread2.start();
 		thread3.start();
@@ -52,9 +54,9 @@ public class Sudoku implements Runnable{
 	}
 
 		public void thread1Finished(){
+			thread1.delete();
 			thread2.delete();
 			thread3.delete();
-			thread1.delete();
 			System.out.println("WINNER ->>> " + thread1.getThreadName());
 			long finishTime= System.currentTimeMillis() - threadTimer;
 			showTable(thread1.getSudokuTable());
@@ -63,37 +65,45 @@ public class Sudoku implements Runnable{
 			showTable(thread2.getSudokuTable());
 			System.out.println("---THREAD3---");
 			showTable(thread3.getSudokuTable());
-			showFrames();
-		}
-		
-		public void thread2Finished(){
-			/*thread2.delete();
-			thread3.delete();
-			thread1.delete();*/
-			System.out.println("WINNER ->>> " + thread2.getThreadName());
-			long finishTime= System.currentTimeMillis() - threadTimer;
-			showTable(thread2.getSudokuTable());
-			System.out.println("----- "+finishTime+ " -----");
-			System.out.println("---THREAD2---");
-			showTable(thread2.getSudokuTable());
-			System.out.println("---THREAD3---");
-			showTable(thread3.getSudokuTable());
+			//System.out.println("th1 ->  " + thread1.getT().isAlive());
 			showFrames();
 			
 		}
 		
-		public void thread3Finished(){
+		public void thread2Finished(){
+			thread1.delete();
 			thread2.delete();
 			thread3.delete();
+
+			System.out.println("WINNER ->>> " + thread2.getThreadName());
+			long finishTime= System.currentTimeMillis() - threadTimer;
+			showTable(thread2.getSudokuTable());
+			System.out.println("----- "+finishTime+ " -----");
+			System.out.println("---THREAD1---");
+			showTable(thread1.getSudokuTable());
+			System.out.println("---THREAD3---");
+			showTable(thread3.getSudokuTable());
+			//System.out.println("th1 ->  " + thread1.getT().isAlive());
+
+			showFrames();
+		}
+		
+		public void thread3Finished(){
 			thread1.delete();
+			thread2.delete();
+			thread3.delete();
+
+
 			System.out.println("WINNER ->>> " + thread3.getThreadName());
 			long finishTime= System.currentTimeMillis() - threadTimer;
 			showTable(thread3.getSudokuTable());
 			System.out.println("----- "+finishTime+ " -----");
-			System.out.println("---THREAD2---");
-			showTable(thread2.getSudokuTable());
+			System.out.println("---THREAD1---");
+			showTable(thread1.getSudokuTable());
 			System.out.println("---THREAD3---");
 			showTable(thread3.getSudokuTable());
+			//System.out.println("th1 ->  " + thread1.getT().isAlive());
+
 			showFrames();
 		}
 		
@@ -107,61 +117,62 @@ public class Sudoku implements Runnable{
 		}
 	  
 	  public void showFrames(){
-		  String column[]={" "," "," "," "," "," "," "," "," "};
-			int dataT1[][] = thread1.getSudokuTable();
-			String stringDataT1[][] = new String[9][9];
-			for(int i=0;i<9;i++)
-				for(int j=0;j<9;j++){
-					stringDataT1[i][j] = "" + dataT1[i][j];
-				}
-			  JTable thread1JT=new JTable(stringDataT1,column);
-			  thread1JT.getTableHeader().setUI(null);
-		        JScrollPane thread1SP=new JScrollPane(thread1JT);
-		        thread1Frame.setTitle("thread1");
-		        thread1Frame.add(thread1SP);
-		        thread1Frame.setSize(500,195);
-		        thread1Frame.setResizable(false);
-		        thread1Frame.setLocation(150,200);
-		        thread1Frame.setVisible(true);
-		        thread1Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		        
-		        
-		        int dataT2[][] = thread2.getSudokuTable();
-				String stringDataT2[][] = new String[9][9];
-
+			  String column[]={" "," "," "," "," "," "," "," "," "};
+				int dataT1[][] = thread1.getSudokuTable();
+				String stringDataT1[][] = new String[9][9];
 				for(int i=0;i<9;i++)
 					for(int j=0;j<9;j++){
-						stringDataT2[i][j] = "" + dataT2[i][j];
+						stringDataT1[i][j] = "" + dataT1[i][j];
 					}
-				  JTable thread2JT=new JTable(stringDataT2,column);
-				  thread2JT.getTableHeader().setUI(null);
-			        JScrollPane thread2SP=new JScrollPane(thread2JT);
-			        thread2Frame.setTitle("thread2");
-			        thread2Frame.add(thread2SP);
-			        thread2Frame.setSize(500,195);
-			        thread2Frame.setResizable(false);
-			        thread2Frame.setLocation(300,200);
-			        thread2Frame.setVisible(true);
-			        thread2Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				  JTable thread1JT=new JTable(stringDataT1,column);
+				  thread1JT.getTableHeader().setUI(null);
+			        JScrollPane thread1SP=new JScrollPane(thread1JT);
+			        thread1Frame.setTitle("thread1");
+			        thread1Frame.add(thread1SP);
+			        thread1Frame.setSize(500,195);
+			        thread1Frame.setResizable(false);
+			        thread1Frame.setLocation(150,200);
+			        thread1Frame.setVisible(true);
+			        thread1Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			        
-			        int dataT3[][] = thread3.getSudokuTable();
-					String stringDataT3[][] = new String[9][9];
+			        
+			        int dataT2[][] = thread2.getSudokuTable();
+					String stringDataT2[][] = new String[9][9];
 
 					for(int i=0;i<9;i++)
 						for(int j=0;j<9;j++){
-							stringDataT3[i][j] = "" + dataT3[i][j];
+							stringDataT2[i][j] = "" + dataT2[i][j];
 						}
-					  JTable thread3JT=new JTable(stringDataT3,column);
-					  thread3JT.getTableHeader().setUI(null);
-				        JScrollPane thread3SP=new JScrollPane(thread3JT);
-				        thread3Frame.setTitle("thread3");
-				        thread3Frame.add(thread3SP);
-				        thread3Frame.setSize(500,195);
-				        thread3Frame.setResizable(false);
-				        thread3Frame.setLocation(300,200);
-				        thread3Frame.setVisible(true);
-				        thread3Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	  }
+					  JTable thread2JT=new JTable(stringDataT2,column);
+					  thread2JT.getTableHeader().setUI(null);
+				        JScrollPane thread2SP=new JScrollPane(thread2JT);
+				        thread2Frame.setTitle("thread2");
+				        thread2Frame.add(thread2SP);
+				        thread2Frame.setSize(500,195);
+				        thread2Frame.setResizable(false);
+				        thread2Frame.setLocation(300,200);
+				        thread2Frame.setVisible(true);
+				        thread2Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				        
+				        int dataT3[][] = thread3.getSudokuTable();
+						String stringDataT3[][] = new String[9][9];
+
+						for(int i=0;i<9;i++)
+							for(int j=0;j<9;j++){
+								stringDataT3[i][j] = "" + dataT3[i][j];
+							}
+						  JTable thread3JT=new JTable(stringDataT3,column);
+						  thread3JT.getTableHeader().setUI(null);
+					        JScrollPane thread3SP=new JScrollPane(thread3JT);
+					        thread3Frame.setTitle("thread3");
+					        thread3Frame.add(thread3SP);
+					        thread3Frame.setSize(500,195);
+					        thread3Frame.setResizable(false);
+					        thread3Frame.setLocation(300,200);
+					        thread3Frame.setVisible(true);
+					        thread3Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		  }
+			 
 	
 	public Sudoku(){
 		

@@ -8,20 +8,12 @@ import java.io.PrintWriter;
 public class Solver2 extends Thread{
 	   private Thread t;
 	   private String threadName;
-	   int sudokuTable[][] = new int[9][9];
-	   static String winnerName = "null";
-	   public int startX,startY;
+	   static int sudokuTable[][] = new int[9][9];
 	   public boolean didThisClassSolvedCorrect = false;
-	   Sudoku controller =  new Sudoku();
+	   public int startX,startY;
+	   Sudoku controller = new Sudoku();
 	   
-	   public static String getWinnerName() {
-		return winnerName;
-	}
-
-	public static void setWinnerName(String winnerName) {
-		Solver1.winnerName = winnerName;
-	}
-
+	   
 	public int[][] getSudokuTable() {
 		return sudokuTable;
 	}
@@ -56,40 +48,50 @@ public class Solver2 extends Thread{
 		}
 	   
 	   public void delete(){
-		   t.interrupt();
-
+		   t=null;
 	   }
 	   
+	   public synchronized void shutdown() {
+
+		    t = null;
+
+		    //t.notifyAll();
+		}
+	   boolean stopping = false;
+
+		public synchronized boolean isStopping() {
+
+		    return stopping;
+		}
+	   
 	   public void run() {
+	        Thread thisThread = Thread.currentThread();
+
+		   while(t == thisThread){
 	      System.out.println("Running " +  threadName );
 	      try {
-	         solve(startX,startY);
+	    	  
+	    		 solve(startX,startY);
 	         if(!areWeDone()){
 	        	 startX = 0;
 	        	 startY = 0;
 	        	 solve(startX,startY);
 	         }
-	      } catch (Exception e) {
-	    	  /*System.out.println("----" + threadName +"----");
-				showTable();
-				System.out.println("--------------------------");*/
-			//if(t.isInterrupted())
-	        // System.out.println("Thread " +  threadName + " interrupted.");
-	    	  if(winnerName.equals("null")){
-	    		  winnerName = threadName;
-	    		  delete();
+	         
 	    	  }
-	    	  if(!Sudoku.done)
-		   		   controller.thread2Finished();
+	         
+	      catch (Exception e) {
+	    	  }
 	    	  
-	    	  Sudoku.done=true;
+	    	  if(!Sudoku.done){
+		    	  Sudoku.done=true;
+	    		   controller.thread2Finished();
+
+	    	  }
 	    	  delete();
 	      }
-	      //showTable();
+}
 	      
-	      //System.out.println("Thread " +  threadName + " exiting.");
-	      
-	   }
 	   
 	   public void start () {
 	      System.out.println("Starting " +  threadName );
@@ -114,24 +116,6 @@ public class Solver2 extends Thread{
 		}
 	   
 	   public void solve(int i, int j) throws Exception {
-			// Throw an exception to stop the process if the puzzle is solved
-		   
-		   
-		   try(FileWriter fw = new FileWriter("thread2.txt", true);
-				    BufferedWriter bw = new BufferedWriter(fw);
-				    PrintWriter out = new PrintWriter(bw))
-				{
-				   for(int a=0;a<9;a++){
-					   for(int b=0; b<9; b++){
-						   out.print(sudokuTable[a][b]);
-					   }
-					   out.println();
-				   }
-				   out.println();
-				   out.println();
-				} catch (IOException e) {
-				    //exception handling left as an exercise for the reader
-				}
 		   
 		   if(Sudoku.done)
 				throw new Exception("ex");
@@ -144,22 +128,52 @@ public class Solver2 extends Thread{
 				return;
 			}
 
-			// If the cell is not empty, continue with the next cell
 			if (sudokuTable[i][j] != 0)
 				nextCell(i, j);
 			else {
-				// Find a valid number for the empty cell
 				for (int x = 1; x < 10; x++) {
 					if (!doesRowIncludeThisValue(i, j, x) && !doesColumnIncludeThisValue(i, j, x)
 							&& !does3x3GridIncludeThisValue(i, j, x)) {
 						sudokuTable[i][j] = x;
+						try(FileWriter fw = new FileWriter("thread2.txt", true);
+							    BufferedWriter bw = new BufferedWriter(fw);
+							    PrintWriter out = new PrintWriter(bw))
+							{
+							   for(int a=0;a<9;a++){
+								   for(int b=0; b<9; b++){
+									   out.print(sudokuTable[a][b]);
+								   }
+								   out.println();
+							   }
+							   out.println();
+							   out.println();
+							} catch (IOException e) {
+								System.out.println("hafaf");
+							}
 						nextCell(i, j);
 					}
+					
 				}
-
-				// No valid number was found, clean up and return to caller
+			
 				sudokuTable[i][j] = 0;
+				try(FileWriter fw = new FileWriter("thread2.txt", true);
+					    BufferedWriter bw = new BufferedWriter(fw);
+					    PrintWriter out = new PrintWriter(bw))
+					{
+					   for(int a=0;a<9;a++){
+						   for(int b=0; b<9; b++){
+							   out.print(sudokuTable[a][b]);
+						   }
+						   out.println();
+					   }
+					   out.println();
+					   out.println();
+					} catch (IOException e) {
+						System.out.println("hafaf");
+					}
 			}
+			
+		
 		}
 
 		private boolean does3x3GridIncludeThisValue(int i, int j, int x) {
@@ -203,6 +217,7 @@ public class Solver2 extends Thread{
 		}
 
 		public void nextCell(int i, int j) throws Exception {
+			
 			if (j < 8)
 				solve(i, j + 1);
 			else
