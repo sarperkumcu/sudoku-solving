@@ -8,9 +8,10 @@ import java.io.PrintWriter;
 public class Solver3 extends Thread{
 	   private Thread t;
 	   private String threadName;
-	   static int sudokuTable[][] = new int[9][9];
+	   int sudokuTable[][] = new int[9][9];
 	   public boolean didThisClassSolvedCorrect = false;
 	   public int startX,startY;
+	   
 	   Sudoku controller = new Sudoku();
 	   
 	   
@@ -150,7 +151,6 @@ public class Solver3 extends Thread{
 								   out.println();
 							   }
 							   out.println();
-							   out.println();
 							} catch (IOException e) {
 								System.out.println("hafaf");
 							}
@@ -170,7 +170,6 @@ public class Solver3 extends Thread{
 						   }
 						   out.println();
 					   }
-					   out.println();
 					   out.println();
 					} catch (IOException e) {
 						System.out.println("hafaf");
