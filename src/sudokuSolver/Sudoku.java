@@ -7,14 +7,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
-public class Sudoku implements Runnable {
+public class Sudoku {
 	private static final String FILENAME = "sudoku.txt";
 	int sudokuTable[][] = new int[9][9];
 	static boolean done = false;
@@ -24,7 +28,7 @@ public class Sudoku implements Runnable {
 	static Solver3 thread3;
 
 	public String winnerThreadName;
-	
+
 	public List<Integer[][]> winnerSolutionWay = new ArrayList<Integer[][]>();
 
 	int counter = 0;
@@ -35,9 +39,9 @@ public class Sudoku implements Runnable {
 	JFrame thread2Frame = new JFrame();
 	JFrame thread3Frame = new JFrame();
 	JFrame winnerFrame = new JFrame();
-	
+
 	long finishTime;
-	
+
 	public static void main(String[] args) throws Exception {
 
 		PrintWriter writer = new PrintWriter("thread1.txt");
@@ -57,10 +61,10 @@ public class Sudoku implements Runnable {
 		sudokuTable2.setTable();
 		sudokuTable3.setTable();
 		// sudoku.showTable();
-		thread1 = new Solver1("thread1", sudokuTable1.sudokuTable, 7, 0);
+		thread1 = new Solver1("thread1", sudokuTable1.sudokuTable, 5, 0);
 		thread2 = new Solver2("thread2", sudokuTable2.sudokuTable, 8, 1);
-		thread3 = new Solver3("thread3", sudokuTable3.sudokuTable, 5, 0);
-		sudokuTable1.thread1.start();
+		thread3 = new Solver3("thread3", sudokuTable3.sudokuTable, 4, 0);
+		thread1.start();
 		thread2.start();
 		thread3.start();
 		threadTimer = System.currentTimeMillis();
@@ -71,9 +75,7 @@ public class Sudoku implements Runnable {
 		thread2.delete();
 		thread3.delete();
 		winnerThreadName = thread1.getThreadName();
-		System.out.println("WINNER ->>> " + thread1.getThreadName());
 		finishTime = System.currentTimeMillis() - threadTimer;
-		System.out.println("----- " + finishTime + "ms -----");
 		showFrames();
 
 	}
@@ -83,9 +85,7 @@ public class Sudoku implements Runnable {
 		thread2.delete();
 		thread3.delete();
 		winnerThreadName = thread2.getThreadName();
-		System.out.println("WINNER ->>> " + thread2.getThreadName());
 		finishTime = System.currentTimeMillis() - threadTimer;
-		System.out.println("----- " + finishTime + "ms -----");
 
 		showFrames();
 	}
@@ -95,9 +95,7 @@ public class Sudoku implements Runnable {
 		thread2.delete();
 		thread3.delete();
 		winnerThreadName = thread3.getThreadName();
-		System.out.println("WINNER ->>> " + thread3.getThreadName());
 		finishTime = System.currentTimeMillis() - threadTimer;
-		System.out.println("----- " + finishTime + "ms -----");
 		showFrames();
 	}
 
@@ -111,7 +109,6 @@ public class Sudoku implements Runnable {
 	}
 
 	public void showFrames() {
-		String column[] = { " ", " ", " ", " ", " ", " ", " ", " ", " " };
 		int dataT1[][] = thread1.getSudokuTable();
 		String stringDataT1[][] = new String[9][9];
 		for (int i = 0; i < 9; i++)
@@ -167,7 +164,7 @@ public class Sudoku implements Runnable {
 
 		BufferedReader br = null;
 		FileReader fr = null;
-		try{
+		try {
 			fr = new FileReader(winnerThreadName + ".txt");
 			br = new BufferedReader(fr);
 			String sCurrentLine;
@@ -208,66 +205,60 @@ public class Sudoku implements Runnable {
 			}
 		}
 
-		for (int i = 0; i < winnerSolutionWay.size(); i++) {
-			Integer[][] f = winnerSolutionWay.get(i);
-			for (int a = 0; a < 9; a++) {
-				for (int b = 0; b < 9; b++) {
-					System.out.print(f[a][b]);
-				}
-				System.out.println();
-			}
-			System.out.println();
-			System.out.println();
-		}
 		JComboBox<Integer> comboBox = new JComboBox<Integer>();
-		 for(int i=0;i<winnerSolutionWay.size();i++)
-			 comboBox.addItem(i);
-		 
-		 comboBox.addActionListener(new ActionListener() {
-			 
-			    @Override
-			    public void actionPerformed(ActionEvent event) {
-			        JComboBox<Integer> combo = (JComboBox<Integer>) event.getSource();
-			        Integer selectedStep = (Integer) combo.getSelectedItem();
-			        JFrame test = new JFrame();
-			        
-			        Integer dataWinner[][] = winnerSolutionWay.get(selectedStep);
-					String stringDataWiner[][] = new String[9][9];
+		for (int i = 0; i < winnerSolutionWay.size(); i++)
+			comboBox.addItem(i);
 
-					for (int i = 0; i < 9; i++)
-						for (int j = 0; j < 9; j++) {
-							stringDataWiner[i][j] = "" + dataWinner[i][j];
-						}
-					JTable threadWinnerJT = new JTable(stringDataWiner, column);
-					threadWinnerJT.getTableHeader().setUI(null);
-					JScrollPane threadWinnerSP = new JScrollPane(threadWinnerJT);
-					test.setTitle("" + selectedStep + ". step");
-					test.add(threadWinnerSP);
-					test.setSize(500, 195);
-					test.setResizable(false);
-					test.setLocation(300, 200);
-					test.setVisible(true);
-			    }
-			});
-		 
-			winnerFrame.setTitle("Winner - " + winnerThreadName + "- Solved in " + finishTime + "ms");
-			winnerFrame.add(comboBox);
-			winnerFrame.setSize(500, 195);
-			winnerFrame.setResizable(false);
-			winnerFrame.setLocation(300, 200);
-			winnerFrame.setVisible(true);
-			winnerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		comboBox.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				JComboBox<Integer> combo = (JComboBox<Integer>) event.getSource();
+				Integer selectedStep = (Integer) combo.getSelectedItem();
+				JFrame test = new JFrame();
+
+				Integer dataWinner[][] = winnerSolutionWay.get(selectedStep);
+				String stringDataWiner[][] = new String[9][9];
+
+				for (int i = 0; i < 9; i++)
+					for (int j = 0; j < 9; j++) {
+						stringDataWiner[i][j] = "" + dataWinner[i][j];
+					}
+				JTable threadWinnerJT = new JTable(stringDataWiner, column);
+				threadWinnerJT.getTableHeader().setUI(null);
+				JScrollPane threadWinnerSP = new JScrollPane(threadWinnerJT);
+				test.setTitle("" + selectedStep + ". step");
+				test.add(threadWinnerSP);
+				test.setSize(500, 195);
+				test.setResizable(false);
+				test.setLocation(300, 200);
+				test.setVisible(true);
+			}
+		});
+
+		winnerFrame.setTitle("Winner - " + winnerThreadName + "- Solved in " + finishTime + "ms");
+		winnerFrame.add(comboBox);
+		winnerFrame.setSize(500, 195);
+		winnerFrame.setResizable(false);
+		winnerFrame.setLocation(300, 200);
+		winnerFrame.setVisible(true);
+		winnerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		TimerTask timerTask = new SolutionSteps(winnerSolutionWay, finishTime, winnerThreadName);
+
+		Timer timer = new Timer(true);
+		timer.scheduleAtFixedRate(timerTask, new Date(), 20);
 	}
+
+	Integer dataWinner[][];
+	String column[] = { " ", " ", " ", " ", " ", " ", " ", " ", " " };
+	DefaultTableModel dtm;
 
 	public Sudoku() {
 
 	}
 
-	@Override
-	public void run() {
-
-	}
+	int stepNumber = 0;
 
 	public void setTable() {
 		BufferedReader br = null;
